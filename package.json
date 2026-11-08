@@ -20,7 +20,14 @@
       "@types/react": "19.0.5",
       "@types/react-dom": "19.0.5",
       "tsconfig-paths": "^4.2.0"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "@swc/core",
+      "esbuild",
+      "msgpackr-extract",
+      "protobufjs",
+      "unrs-resolver"
+    ]
   },
   "devDependencies": {
     "@medusajs/eslint-plugin": "2.22.3",

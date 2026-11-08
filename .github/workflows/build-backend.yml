@@ -1,0 +1,49 @@
+name: build-backend
+
+# Builds the Medusa backend + admin dashboard on a 7 GB GitHub runner and
+# uploads the platform-independent .medusa output. The 1 GB e2-micro VM can't
+# complete the admin (Vite) build (swap thrash), so we build here and ship the
+# artifact to the VM, which already has the matching Linux node_modules.
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10.11.1
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build backend + admin
+        run: pnpm --filter @dtc/backend build
+        env:
+          NODE_ENV: production
+          NODE_OPTIONS: --max-old-space-size=6144
+          # Placeholders only — the build compiles, it does not connect to a DB.
+          DATABASE_URL: postgres://user:pass@localhost:5432/db
+          REDIS_URL: redis://localhost:6379
+          JWT_SECRET: build-time-placeholder
+          COOKIE_SECRET: build-time-placeholder
+          STORE_CORS: http://localhost:8000
+          ADMIN_CORS: http://localhost:9000
+          AUTH_CORS: http://localhost:9000
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: medusa-build
+          path: apps/backend/.medusa
+          retention-days: 3
