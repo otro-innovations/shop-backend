@@ -3,6 +3,7 @@ import { LOGIN_VIEW } from "@modules/account/templates/login-template"
 import ErrorMessage from "@modules/checkout/components/error-message"
 import { SubmitButton } from "@modules/checkout/components/submit-button"
 import Input from "@modules/common/components/input"
+import GoogleButton from "@modules/account/components/google-button"
 import { useActionState } from "react"
 
 type Props = {
@@ -30,6 +31,12 @@ const Login = ({ setCurrentView }: Props) => {
           Please verify your email, then sign in.
         </div>
       )}
+      <GoogleButton />
+      <div className="my-5 flex w-full items-center gap-3 text-[10px] uppercase tracking-[0.2em] text-ui-fg-muted">
+        <span className="h-px flex-1 bg-ui-border-base" />
+        or
+        <span className="h-px flex-1 bg-ui-border-base" />
+      </div>
       <form className="w-full" action={formAction}>
         <div className="flex flex-col w-full gap-y-2">
           <Input
