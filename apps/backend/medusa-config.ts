@@ -2,6 +2,22 @@ import { loadEnv, defineConfig } from '@medusajs/framework/utils'
 
 loadEnv(process.env.NODE_ENV || 'development', process.cwd())
 
+// Auth providers: password (emailpass) always on; Google enabled only once
+// GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET are provided, so the backend never
+// fails to boot waiting on OAuth credentials.
+const authProviders: any[] = [{ resolve: '@medusajs/auth-emailpass', id: 'emailpass' }]
+if (process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET) {
+  authProviders.push({
+    resolve: '@medusajs/auth-google',
+    id: 'google',
+    options: {
+      clientId: process.env.GOOGLE_CLIENT_ID,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+      callbackUrl: process.env.GOOGLE_CALLBACK_URL,
+    },
+  })
+}
+
 module.exports = defineConfig({
   projectConfig: {
     databaseUrl: process.env.DATABASE_URL,
@@ -14,6 +30,10 @@ module.exports = defineConfig({
     }
   },
   modules: [
+    {
+      resolve: '@medusajs/medusa/auth',
+      options: { providers: authProviders },
+    },
     {
       resolve: '@medusajs/medusa/payment',
       options: {
