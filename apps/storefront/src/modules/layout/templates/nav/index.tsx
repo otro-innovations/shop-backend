@@ -19,10 +19,15 @@ export default async function Nav() {
     listCategories({
       fields:
         "id,name,handle,parent_category_id,category_children.id,category_children.name,category_children.handle",
+      limit: 1000,
     }),
   ])
 
-  const topCats = (categories || []).filter((c) => !c.parent_category_id).slice(0, 7)
+  const topCats = (categories || [])
+    .filter((c) => !c.parent_category_id)
+    .sort((a, b) => a.name.localeCompare(b.name))
+
+  const quick = topCats.slice(0, 4)
 
   return (
     <div className="sticky top-0 inset-x-0 z-50 w-full">
@@ -40,46 +45,41 @@ export default async function Nav() {
             </span>
           </LocalizedClientLink>
 
-          <div className="hidden small:flex items-center gap-7 text-[13px] font-medium text-[var(--otro-ink)]">
+          <div className="hidden small:flex items-center gap-6 text-[13px] font-medium text-[var(--otro-ink)]">
+            {/* All categories mega-menu */}
             <div className="group relative">
-              <button className="flex items-center gap-1 py-5 hover:text-[var(--otro-gold)]">
-                Shop all
+              <LocalizedClientLink href="/categories" className="flex items-center gap-1.5 py-5 hover:text-[var(--otro-gold)]">
+                <svg viewBox="0 0 24 24" className="h-4 w-4" fill="none" stroke="currentColor" strokeWidth="1.8"><path d="M4 6h16M4 12h16M4 18h16" strokeLinecap="round"/></svg>
+                All categories
                 <svg viewBox="0 0 10 6" className="h-1.5 w-2.5 opacity-60"><path d="M1 1l4 4 4-4" stroke="currentColor" strokeWidth="1.4" fill="none" strokeLinecap="round" /></svg>
-              </button>
-              <div className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition absolute left-0 top-full w-[640px] rounded-2xl border border-[var(--otro-line)] bg-white p-6 shadow-2xl">
-                <div className="grid grid-cols-3 gap-x-8 gap-y-5">
-                  {topCats.length > 0 ? (
-                    topCats.map((c) => (
-                      <div key={c.id} className="flex flex-col gap-2">
-                        <LocalizedClientLink href={`/categories/${c.handle}`} className="text-sm font-semibold text-[var(--otro-ink)] hover:text-[var(--otro-gold)]">
-                          {c.name}
-                        </LocalizedClientLink>
-                        <ul className="flex flex-col gap-1.5">
-                          {(c.category_children || []).slice(0, 6).map((ch) => (
-                            <li key={ch.id}>
-                              <LocalizedClientLink href={`/categories/${ch.handle}`} className="text-xs text-[var(--otro-muted)] hover:text-[var(--otro-ink)]">
-                                {ch.name}
-                              </LocalizedClientLink>
-                            </li>
-                          ))}
-                        </ul>
-                      </div>
-                    ))
-                  ) : (
-                    <div className="col-span-3 text-sm text-[var(--otro-muted)]">
-                      Categories will appear here once you add them in the admin.
-                    </div>
-                  )}
+              </LocalizedClientLink>
+              <div className="invisible opacity-0 translate-y-1 group-hover:visible group-hover:opacity-100 group-hover:translate-y-0 transition absolute left-0 top-full w-[min(90vw,980px)] rounded-2xl border border-[var(--otro-line)] bg-white p-6 shadow-2xl">
+                <div className="grid grid-cols-4 gap-x-6 gap-y-3">
+                  {topCats.map((c) => (
+                    <LocalizedClientLink
+                      key={c.id}
+                      href={`/categories/${c.handle}`}
+                      className="flex items-center justify-between rounded-lg px-2 py-1.5 text-[13px] text-[var(--otro-ink)] hover:bg-[var(--otro-cream)]"
+                    >
+                      <span className="truncate">{c.name}</span>
+                      <span className="ml-2 shrink-0 rounded-full bg-[var(--otro-cream)] px-1.5 py-0.5 text-[10px] text-[var(--otro-muted)]">
+                        {c.category_children?.length || 0}
+                      </span>
+                    </LocalizedClientLink>
+                  ))}
                 </div>
-                <div className="mt-5 border-t border-[var(--otro-line)] pt-4">
-                  <LocalizedClientLink href="/store" className="text-xs font-semibold text-[var(--otro-gold)] hover:underline">
-                    Browse everything →
+                <div className="mt-5 flex items-center justify-between border-t border-[var(--otro-line)] pt-4">
+                  <LocalizedClientLink href="/categories" className="text-xs font-semibold text-[var(--otro-gold)] hover:underline">
+                    View all {topCats.length} departments →
+                  </LocalizedClientLink>
+                  <LocalizedClientLink href="/store" className="text-xs font-semibold text-[var(--otro-muted)] hover:text-[var(--otro-ink)]">
+                    Browse products →
                   </LocalizedClientLink>
                 </div>
               </div>
             </div>
 
-            {topCats.slice(0, 4).map((c) => (
+            {quick.map((c) => (
               <LocalizedClientLink key={c.id} href={`/categories/${c.handle}`} className="py-5 hover:text-[var(--otro-gold)]">
                 {c.name}
               </LocalizedClientLink>
@@ -87,13 +87,13 @@ export default async function Nav() {
             <LocalizedClientLink href="/collections/swedish-corner" className="py-5 hover:text-[var(--otro-gold)]">
               Swedish Corner
             </LocalizedClientLink>
-            <a href="https://wa.me/sheikhsocial" target="_blank" rel="noreferrer" className="py-5 hover:text-[var(--otro-gold)]">
-              Contact
-            </a>
           </div>
 
-          <div className="flex items-center gap-4 small:gap-6 h-full text-[var(--otro-ink)]">
+          <div className="flex items-center gap-4 small:gap-5 h-full text-[var(--otro-ink)]">
             <Search />
+            <LocalizedClientLink className="hidden small:inline hover:text-[var(--otro-gold)]" href="/account/orders" data-testid="nav-track-link">
+              Track order
+            </LocalizedClientLink>
             <LocalizedClientLink className="hidden small:inline hover:text-[var(--otro-gold)]" href="/account" data-testid="nav-account-link">
               Account
             </LocalizedClientLink>

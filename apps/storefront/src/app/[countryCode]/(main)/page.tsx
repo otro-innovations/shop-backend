@@ -56,6 +56,7 @@ export default async function Home(props: {
     listCategories({
       fields:
         "id,name,handle,parent_category_id,category_children.id,category_children.name,category_children.handle",
+      limit: 1000,
     }),
   ])
 
