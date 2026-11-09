@@ -1,8 +1,8 @@
 import { Metadata } from "next"
 
-import FeaturedProducts from "@modules/home/components/featured-products"
 import Hero from "@modules/home/components/hero"
 import LocalizedClientLink from "@modules/common/components/localized-client-link"
+import PaginatedProducts from "@modules/store/templates/paginated-products"
 import { listCategories } from "@lib/data/categories"
 import { listCollections } from "@lib/data/collections"
 import { getRegion, listRegions } from "@lib/data/regions"
@@ -153,13 +153,20 @@ export default async function Home(props: {
         </section>
       )}
 
-      {/* Featured collections */}
+      {/* Featured products */}
       <section className="otro-container pb-4">
-        <span className="otro-eyebrow">Featured</span>
-        <h2 className="otro-heading mt-2 mb-2 text-2xl sm:text-3xl">Fresh finds</h2>
-        <ul className="flex flex-col gap-x-6">
-          <FeaturedProducts collections={collections || []} region={region} />
-        </ul>
+        <div className="flex items-end justify-between">
+          <div>
+            <span className="otro-eyebrow">Featured</span>
+            <h2 className="otro-heading mt-2 text-2xl sm:text-3xl">Fresh finds</h2>
+          </div>
+          <LocalizedClientLink href="/store" className="text-xs font-semibold text-[var(--otro-muted)] hover:text-[var(--otro-ink)] pb-1">
+            View all →
+          </LocalizedClientLink>
+        </div>
+        <div className="mt-6">
+          <PaginatedProducts sortBy="created_at" page={1} countryCode={countryCode} />
+        </div>
       </section>
 
       {/* Swedish Corner promo */}
